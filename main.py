@@ -4,6 +4,8 @@ import sqlite3
 import logging
 from xml.dom import minidom
 from book import Book, Item
+from test import execute_tests
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -114,8 +116,6 @@ def db_create():
     finally:
         logging.info('Opened database successfully');
         conn.close()
-    # conn.execute('''DROP TABLE INPUT_FILES_INFO;''')
-    # conn.close()
 
 
 def db_add_item(item):
@@ -172,3 +172,4 @@ def select_all_book_info(conn):
 
 
 main('/Users/c-halaks/Documents/task/', '/Users/c-halaks/Documents/incorrect_input/')
+execute_tests()
