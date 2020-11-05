@@ -1,4 +1,4 @@
-class Item(object):
+class Book(object):
 
     def __init__(self, book_name, number_of_paragraph, number_of_words, number_of_letters, words_with_capital_letters, words_in_lowercase):
         self.book_name = book_name
@@ -9,7 +9,7 @@ class Item(object):
         self.words_in_lowercase = words_in_lowercase
 
 
-class Book(object):
+class Word(object):
 
     def __init__(self, word, count, count_uppercase):
         self.word = word

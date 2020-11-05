@@ -3,8 +3,7 @@ import shutil
 import sqlite3
 import logging
 from xml.dom import minidom
-from book import Book, Item
-from test import execute_tests
+from book import Book, Word
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,11 +14,11 @@ def main(path, incorrect_folder_path):
     for f_name in os.listdir(path):
         try:
             if f_name.endswith('.fb2'):
-                item = get_item(path + f_name)
-                books = get_book(path + f_name)
-                db_add_item(item)
-                for book in books:
-                    db_add_book(book)
+                book = get_book(path + f_name)
+                words = get_word(path + f_name)
+                db_add_book(book)
+                for word in words:
+                    db_add_word(word)
             else:
                 try:
                     shutil.move(path + f_name, incorrect_folder_path)
@@ -57,7 +56,7 @@ def get_text(nodelist):
     return ''.join(rc)
 
 
-def get_item(file_path):
+def get_book(file_path):
     xmldoc = minidom.parse(file_path)
     itemlist = xmldoc.getElementsByTagName('section')
     book_name = xmldoc.getElementsByTagName('book-title')[0].firstChild.nodeValue
@@ -75,12 +74,12 @@ def get_item(file_path):
         else:
             words_without_capital_letter += 1
 
-    return Item(book_name, count_p, count_words, count_letters, words_with_capital_letter, words_without_capital_letter)
+    return Book(book_name, count_p, count_words, count_letters, words_with_capital_letter, words_without_capital_letter)
     logging.info('Count of words in lowercase is: ' + str(words_without_capital_letter))
     logging.info('Count of words with capital letter is:' + str(words_with_capital_letter))
 
 
-def get_book(file_path):
+def get_word(file_path):
     xmldoc = minidom.parse(file_path)
     itemlist = xmldoc.getElementsByTagName('section')
     text = get_text(itemlist)
@@ -88,10 +87,10 @@ def get_book(file_path):
 
     words_list = []
     for word in words:
-        words_list.append(Book(word, words.count(word), sum(1 for c in word if c.isupper())))
+        words_list.append(Word(word, words.count(word), sum(1 for c in word if c.isupper())))
     print(words_list)
     return words_list
-    logging.info('Book info is' + words_list)
+    logging.info('Word list is' + words_list)
 
 
 def db_create():
@@ -104,31 +103,31 @@ def db_create():
                  NUMBER_OF_LETTERS        INT,
                  WORDS_WITH_CAPITAL_LETTERS        INT,
                  WORDS_IN_LOWERCASE        INT);''')
-        logging.info('Table INPUT_FILES_INFO created successfully');
+        logging.info('Table INPUT_FILES_INFO created successfully')
 
         conn.execute('''CREATE TABLE IF NOT EXISTS BOOK_INFO
                     (WORD CHAR(155)     NOT NULL,
                     COUNT           INT,
                     COUNT_UPPERCASE            INT);''')
-        logging.info('Table BOOK_INFO created successfully');
+        logging.info('Table BOOK_INFO created successfully')
     except sqlite3.Error as e:
         print(e)
     finally:
-        logging.info('Opened database successfully');
+        logging.info('Opened database successfully')
         conn.close()
 
 
-def db_add_item(item):
+def db_add_book(book):
     try:
         conn = sqlite3.connect('test.db')
         sql = '''INSERT INTO INPUT_FILES_INFO(BOOK_NAME, NUMBER_OF_PARAGRAPH, NUMBER_OF_WORDS, NUMBER_OF_LETTERS, 
         WORDS_WITH_CAPITAL_LETTERS, WORDS_IN_LOWERCASE) VALUES(?,?,?,?,?,?) '''
-        records_to_insert = (item.book_name, item.number_of_paragraph, item.number_of_words, item.number_of_letters,
-                             item.words_with_capital_letters, item.words_in_lowercase)
+        records_to_insert = (book.book_name, book.number_of_paragraph, book.number_of_words, book.number_of_letters,
+                             book.words_with_capital_letters, book.words_in_lowercase)
         cur = conn.cursor()
         cur.execute(sql, records_to_insert)
         conn.commit()
-        logging.info('Inserted into INPUT_FILES_INFO successfully');
+        logging.info('Inserted into INPUT_FILES_INFO successfully')
         return cur.lastrowid
     except sqlite3.Error as e:
         print(e)
@@ -136,16 +135,16 @@ def db_add_item(item):
         conn.close()
 
 
-def db_add_book(book):
+def db_add_word(word):
     try:
         conn = sqlite3.connect('test.db')
         sql = ''' INSERT INTO BOOK_INFO(WORD, COUNT, COUNT_UPPERCASE)
                           VALUES(?,?,?) '''
-        records_to_insert = (book.word, book.count, book.count_uppercase)
+        records_to_insert = (word.word, word.count, word.count_uppercase)
         cur = conn.cursor()
         cur.execute(sql, records_to_insert)
         conn.commit()
-        logging.info('Inserted into BOOK_INFO successfully');
+        logging.info('Inserted into BOOK_INFO successfully')
         return cur.lastrowid
     except sqlite3.Error as e:
         print(e)
@@ -172,4 +171,3 @@ def select_all_book_info(conn):
 
 
 main('/Users/c-halaks/Documents/task/', '/Users/c-halaks/Documents/incorrect_input/')
-execute_tests()

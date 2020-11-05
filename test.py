@@ -1,48 +1,40 @@
 import logging
-import sqlite3
+
+from book import Book
+from book import Word
 
 
-def execute_tests():
-    try:
-        conn = sqlite3.connect('test.db')
-        test_size(conn)
-        test_book_size(conn)
-        test_count_more_than_0(conn)
-        test_type_book_name(conn)
-        test_type_number_of_paragraph(conn)
-        test_type_number_of_words(conn)
-        test_type_number_of_letters(conn)
-        test_type_words_with_capital_letters(conn)
-        test_type_words_in_lowercase(conn)
-        test_type_word(conn)
-        test_type_count(conn)
-        test_type_count_uppercase(conn)
-    except sqlite3.Error as e:
-        print(e)
-    finally:
-        logging.info('Closed connection')
-        conn.close()
-
-
-def test_size(conn):
+def get_books(conn):
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM BOOK_INFO")
+    cur.execute("SELECT * FROM INPUT_FILES_INFO")
     rows = cur.fetchall()
-    assert len(rows) != 0
+    books_list = []
+    for row in rows:
+        books_list.append(Book(row[0], row[1], row[2], row[3], row[4], row[5]))
+    return books_list
 
 
-def test_book_size(conn):
+def get_words(conn):
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM INPUT_FILES_INFO")
+    cur.execute("SELECT * FROM BOOK_INFO")
     rows = cur.fetchall()
-    assert len(rows) != 0
+    words_list = []
+    for row in rows:
+        words_list.append(Word(row[0], row[1], row[2]))
+    return words_list
 
 
-def test_count_more_than_0(conn):
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(DISTINCT WORD) FROM BOOK_INFO")
-    rows = cur.fetchall()
-    assert len(rows) >= 0
+def test_size(words_list):
+    assert len(words_list) > 0
+
+
+def test_book_size(books_list):
+    assert len(books_list) > 0
+
+
+def test_count_more_than_0(words_list):
+    for word in words_list:
+        assert len(word.word) > 0
 
 
 def assert_rows(rows, assert_type):
@@ -51,58 +43,46 @@ def assert_rows(rows, assert_type):
         assert isinstance(row[0], assert_type)
 
 
-def test_type_book_name(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT BOOK_NAME FROM INPUT_FILES_INFO").fetchall()
-    assert_rows(rows, str)
+def test_type_book_name(books_list):
+    for book in books_list:
+        assert type(book.book_name) == str
 
 
-def test_type_number_of_paragraph(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT NUMBER_OF_PARAGRAPH FROM INPUT_FILES_INFO")
-    assert_rows(rows, int)
+def test_type_number_of_paragraph(books_list):
+    for book in books_list:
+        assert type(book.number_of_paragraph) == int
 
 
-def test_type_number_of_words(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT NUMBER_OF_WORDS FROM INPUT_FILES_INFO")
-    assert_rows(rows, int)
+def test_type_number_of_words(books_list):
+    for book in books_list:
+        assert type(book.number_of_words) == int
 
 
-def test_type_number_of_letters(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT NUMBER_OF_LETTERS FROM INPUT_FILES_INFO")
-    assert_rows(rows, int)
+def test_type_number_of_letters(books_list):
+    for book in books_list:
+        assert type(book.number_of_letters) == int
 
 
-def test_type_words_with_capital_letters(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT WORDS_WITH_CAPITAL_LETTERS FROM INPUT_FILES_INFO")
-    assert_rows(rows, int)
+def test_type_words_with_capital_letters(books_list):
+    for book in books_list:
+        assert type(book.words_with_capital_letters) == int
 
 
-def test_type_words_in_lowercase(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT WORDS_IN_LOWERCASE FROM INPUT_FILES_INFO")
-    assert_rows(rows, int)
+def test_type_words_in_lowercase(books_list):
+    for book in books_list:
+        assert type(book.words_in_lowercase) == int
 
 
-def test_type_word(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT WORD FROM BOOK_INFO")
-    assert_rows(rows, str)
+def test_type_word(words_list):
+    for word in words_list:
+        assert type(word.word) == str
 
 
-def test_type_count(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT COUNT FROM BOOK_INFO")
-    assert_rows(rows, int)
+def test_type_count(words_list):
+    for word in words_list:
+        assert type(word.count) == int
 
 
-def test_type_count_uppercase(conn):
-    cur = conn.cursor()
-    rows = cur.execute("SELECT COUNT_UPPERCASE FROM BOOK_INFO")
-    assert_rows(rows, int)
-
-
-
+def test_type_count_uppercase(words_list):
+    for word in words_list:
+        assert type(word.count_uppercase) == int
