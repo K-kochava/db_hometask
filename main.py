@@ -93,9 +93,9 @@ def get_word(file_path):
     logging.info('Word list is' + words_list)
 
 
-def db_crdeate():
+def db_create():
     try:
-        #conn = sqlite3.connect('test.db')
+        conn = sqlite3.connect('test.db')
         conn.execute('''CREATE TABLE IF NOT EXISTS INPUT_FILES_INFO
                  (BOOK_NAME  CHAR(155) PRIMARY KEY     NOT NULL,
                  NUMBER_OF_PARAGRAPH            INT,
