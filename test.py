@@ -25,11 +25,11 @@ def get_words(conn):
 
 
 def test_size(words_list):
-    assert len(words_list) > 0
+    assert len(words_list) < 0
 
 
 def test_book_size(books_list):
-    assert len(books_list) > 0
+    assert len(books_list) < 0
 
 
 def test_count_more_than_0(words_list):

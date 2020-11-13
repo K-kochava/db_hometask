@@ -119,7 +119,7 @@ def db_create():
 
 def db_add_book(book):
     try:
-        conn = sqlite3.connect('test.db')
+        conn = sqlite3.connect('')
         sql = '''INSERT INTO INPUT_FILES_INFO(BOOK_NAME, NUMBER_OF_PARAGRAPH, NUMBER_OF_WORDS, NUMBER_OF_LETTERS, 
         WORDS_WITH_CAPITAL_LETTERS, WORDS_IN_LOWERCASE) VALUES(?,?,?,?,?,?) '''
         records_to_insert = (book.book_name, book.number_of_paragraph, book.number_of_words, book.number_of_letters,
